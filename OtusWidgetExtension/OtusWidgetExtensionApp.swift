@@ -11,7 +11,7 @@ import SwiftUI
 struct OtusWidgetExtensionApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }

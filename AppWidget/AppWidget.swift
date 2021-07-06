@@ -8,7 +8,9 @@
 import WidgetKit
 import SwiftUI
 
+
 struct Provider: TimelineProvider {
+
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date())
     }
@@ -19,19 +21,13 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate)
-            entries.append(entry)
-        }
-
+        let entryDate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())!
+        let entry = SimpleEntry(date: entryDate)
+        let entries: [SimpleEntry] = [entry]
         let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
     }
+    
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -39,17 +35,37 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct AppWidgetEntryView : View {
+    
     var entry: Provider.Entry
-
+    
+    @Environment(\.widgetFamily) var family
+    
     var body: some View {
-        Text(entry.date, style: .time)
+        
+        switch family {
+        case .systemSmall:
+            Text("small widget! try to use another size")
+        default:
+            VStack{
+                Spacer()
+                Link(destination: URL(string: "mywidgetapp:///inputlink")!, label: {
+                    Text("Input Data")
+                }).foregroundColor(.blue)
+                Spacer()
+                Link(destination: URL(string: "mywidgetapp:///statisticslink")!, label: {
+                    Text("Statistics")
+                }).foregroundColor(.blue)
+                Spacer()
+            }
+        }
     }
+    
 }
 
 @main
 struct AppWidget: Widget {
     let kind: String = "AppWidget"
-
+    
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             AppWidgetEntryView(entry: entry)
